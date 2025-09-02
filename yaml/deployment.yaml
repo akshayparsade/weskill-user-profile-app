@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-profile
+  labels: 
+    app: user-profile
+spec: 
+  replicas: 2
+  selector: 
+    matchLabels:
+      app: user-profile
+  template: 
+    metadata:
+      labels: 
+        app: user-profile
+    spec:
+      containers: 
+        - name: user-profile
+          ports:
+            - containerPort: 8080
+          image: akshayparsade/weskill-user-profile:latest
+  strategy: 
+    type: RollingUpdate          
