@@ -1,0 +1,43 @@
+pipeline{
+    agent any
+    stages{
+        stage('Pull'){
+            steps {
+               git branch: 'dev', url: 'https://github.com/akshayparsade/weskill-user-profile-app.git'
+
+            } 
+        }
+        stage('Build'){
+            steps {
+                sh 'mvn clean package -DskipTests'   
+            } 
+        }
+        stage('Test'){
+            steps {
+                withSonarQubeEnv(installationName: 'sonar', credentialsId: 'sonar-token') {
+                   sh 'mvn sonar:sonar -Dsonar.projectKey=weskill-ui \\'
+                }
+                
+            } 
+        }
+        stage('QualityGate'){
+            steps{
+                timeout(10) {
+                   waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+              }
+            }
+        }
+        stage('Docker-Build'){
+            steps {
+                sh '''docker build . -t akshayparsade/weskill-user-profile:latest
+                      docker push akshayparsade/weskill-user-profile:latest
+                      docker rmi -f akshayparsade/weskill-user-profile:latest'''
+            } 
+        }
+        stage('Deploy'){
+            steps {
+                sh 'kubectl apply -f yaml/'
+            } 
+        }
+    }
+}
