@@ -14,7 +14,7 @@ pipeline{
         }
         stage('Test'){
             steps {
-                withSonarQubeEnv(installationName: 'sonar', credentialsId: 'sonar-token') {
+                withSonarQubeEnv(installationName: 'sonar', credentialsId: 'soanar-cred2') {
                    sh 'mvn sonar:sonar -Dsonar.projectKey=user-profile-app'
                 }
                 
@@ -23,7 +23,7 @@ pipeline{
         stage('QualityGate'){
             steps{
                 timeout(10) {
-                   waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                   waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token2'
               }
             }
         }
